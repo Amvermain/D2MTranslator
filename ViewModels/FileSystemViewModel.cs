@@ -1,4 +1,7 @@
-﻿using D2MTranslator.ViewModels.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Models;
+using D2MTranslator.ViewModels.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +13,7 @@ using System.Windows.Input;
 
 namespace D2MTranslator.ViewModels
 {
-    public class MainViewModel : ObservableObject
+    public class FileSystemViewModel : ObservableObject
     {
         public ObservableCollection<FileSystemItem>? OriginalItems { get; private set; } = new ObservableCollection<FileSystemItem>();
         public ObservableCollection<FileSystemItem>? ReferenceItems { get; private set; } = new ObservableCollection<FileSystemItem>();
@@ -40,48 +43,6 @@ namespace D2MTranslator.ViewModels
             }
         }
 
-        private List<TranslationItem>? _serializedModContent;
-        private List<TranslationItem>? _serializedReferenceContent;
-        public List<TranslationItem>? SerializedModContent
-        {
-            get => _serializedModContent;
-            set
-            {
-                _serializedModContent = value;
-                OnPropertyChanged(nameof(SerializedModContent));
-            }
-        }
-        public List<TranslationItem>? SerializedReferenceContent
-        {
-            get => _serializedReferenceContent;
-            set
-            {
-                _serializedReferenceContent = value;
-                OnPropertyChanged(nameof(SerializedReferenceContent));
-            }
-        }
-
-
-        private string? _modContentText;
-        private string? _refContentText;
-        public string ModContentText
-        {
-            get => _modContentText;
-            set
-            {
-                _modContentText = value;
-                OnPropertyChanged(nameof(ModContentText));
-            }
-        }
-        public string RefContentText
-        {
-            get => _refContentText;
-            set
-            {
-                _refContentText = value;
-                OnPropertyChanged(nameof(RefContentText));
-            }
-        }
 
         private List<string>? _visibleProperties;
 
@@ -93,7 +54,7 @@ namespace D2MTranslator.ViewModels
 
 
 
-        private void ExecuteOpenFile(RoutedPropertyChangedEventArgs<object> param, FolderType mod)
+        private void ExecuteOpenFile(RoutedPropertyChangedEventArgs<object> param, Enums.FolderType mod)
         {
             if (param.NewValue is FileSystemItem selectedItem)
             {
@@ -102,14 +63,14 @@ namespace D2MTranslator.ViewModels
                 if (File.Exists(fullPath))
                 {
                     var fileContent = File.ReadAllText(fullPath);
-                    if (mod == FolderType.Mod)
+                    if (mod == Enums.FolderType.Mod)
                     {
-                        ModText = fileContent;
+                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, Enums.FolderType.Mod));
                         //LoadJsonAsLines(fileContent, ModLines);
                     }
-                    else if (mod == FolderType.Ref)
+                    else if (mod == Enums.FolderType.Reference)
                     {
-                        RefText = fileContent;
+                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, Enums.FolderType.Reference));
                         //LoadJsonAsLines(fileContent, RefLines);
                     }
                 }
@@ -127,13 +88,7 @@ namespace D2MTranslator.ViewModels
 
         }
 
-        private enum FolderType
-        {
-            Mod,
-            Ref
-        }
-
-        private void ExecuteOpenFolder(object parameter, FolderType type)
+        private void ExecuteOpenFolder(object parameter, Enums.FolderType type)
         {
             CommonOpenFileDialog dialog = new()
             {
@@ -147,21 +102,10 @@ namespace D2MTranslator.ViewModels
                     return;
                 }
 
-                if (type == FolderType.Mod)
+                if (type == Enums.FolderType.Mod)
                     PopulateTreeViewWithJsonFiles(dialog.FileName, OriginalItems);
-                else if (type == FolderType.Ref)
+                else if (type == Enums.FolderType.Reference)
                     PopulateTreeViewWithJsonFiles(dialog.FileName, ReferenceItems);
-            }
-        }
-
-
-        public List<string>? VisibleProperties
-        {
-            get => _visibleProperties;
-            set
-            {
-                _visibleProperties = value;
-                OnPropertyChanged(nameof(VisibleProperties));
             }
         }
 
@@ -189,30 +133,6 @@ namespace D2MTranslator.ViewModels
             return item;
         }
 
-        public ObservableCollection<LineItem> ModLines { get; private set; } = new ObservableCollection<LineItem>();
-        public ObservableCollection<LineItem> RefLines { get; private set; } = new ObservableCollection<LineItem>();
-
-        private string _refText;
-        public string RefText
-        {
-            get => _refText;
-            set
-            {
-                _refText = value;
-                OnPropertyChanged(nameof(RefText));
-            }
-        }
-        private string _modText;
-        public string ModText
-        {
-            get => _modText;
-            set
-            {
-                _modText = value;
-                OnPropertyChanged(nameof(ModText));
-            }
-        }
-
         private void LoadJsonAsLines(string jsonContent, ObservableCollection<LineItem> lines)
         {
             lines.Clear();
@@ -224,12 +144,12 @@ namespace D2MTranslator.ViewModels
             Debug.Write(lines);
         }
 
-        public MainViewModel()
+        public FileSystemViewModel()
         {
-            OpenModFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, FolderType.Mod));
-            OpenRefFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, FolderType.Ref));
-            OpenSelectModFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, FolderType.Mod));
-            OpenSelectRefFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, FolderType.Ref));
+            OpenModFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, Enums.FolderType.Mod));
+            OpenRefFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, Enums.FolderType.Reference));
+            OpenSelectModFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, Enums.FolderType.Mod));
+            OpenSelectRefFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, Enums.FolderType.Reference));
         }
 
     }

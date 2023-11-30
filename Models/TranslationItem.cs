@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace D2MTranslator.ViewModels.Models
+namespace D2MTranslator.Models
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:명명 스타일", Justification = "<보류 중>")]
     [Serializable]

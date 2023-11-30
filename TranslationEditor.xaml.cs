@@ -1,5 +1,6 @@
 ﻿using D2MTranslator.ViewModels;
 using ICSharpCode.AvalonEdit.Search;
+using Ninject;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,13 +10,28 @@ namespace D2MTranslator
     /// <summary>
     /// TextView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class TextView : UserControl
+    public partial class TranslationEditor : UserControl
     {
 
         public static readonly DependencyProperty ModTextProperty = DependencyProperty.Register(
-    "ModText", typeof(string), typeof(TextView), new PropertyMetadata(default(string)));
+    "ModText", typeof(string), typeof(TranslationEditor), new PropertyMetadata(default(string)));
         public static readonly DependencyProperty RefTextProperty = DependencyProperty.Register(
-    "RefText", typeof(string), typeof(TextView), new PropertyMetadata(default(string)));
+    "RefText", typeof(string), typeof(TranslationEditor), new PropertyMetadata(default(string)));
+
+        public TranslationEditor()
+        {
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                DataContext = new JsonFileViewModel();
+                InitializeComponent();
+                this.Loaded += OnLoaded;
+            } else
+            {
+                DataContext = App.Kernel.Get<JsonFileViewModel>();
+                InitializeComponent();
+                this.Loaded += OnLoaded;
+            }
+        }
 
         public string ModText
         {
@@ -29,15 +45,11 @@ namespace D2MTranslator
             set { SetValue(RefTextProperty, value); }
         }
 
-        public TextView()
-        {
-            InitializeComponent();
-            this.Loaded += OnLoaded;
-        }
+        
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var viewModel = DataContext as MainViewModel;
+            var viewModel = DataContext as JsonFileViewModel;
             if (viewModel != null)
             {
                 viewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -51,13 +63,13 @@ namespace D2MTranslator
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var viewModel = sender as MainViewModel;
-            if (e.PropertyName == nameof(MainViewModel.RefText))
+            var viewModel = sender as JsonFileViewModel;
+            if (e.PropertyName == nameof(JsonFileViewModel.RefContentText))
             {
                 if (refOriginalText == null || refOriginalText == string.Empty || refOriginalText == refEditor.Text)
                 {       
-                    refEditor.Text = viewModel.RefText;
-                    refOriginalText = viewModel.RefText;
+                    refEditor.Text = viewModel.RefContentText;
+                    refOriginalText = viewModel.RefContentText;
                 } else
                 {
                     /** create new dialog and ask user if they want to overwrite
@@ -66,8 +78,8 @@ namespace D2MTranslator
                     switch (result)
                     {
                         case MessageBoxResult.Yes:
-                            refEditor.Text = viewModel.RefText;
-                            refOriginalText = viewModel.RefText;
+                            refEditor.Text = viewModel.RefContentText;
+                            refOriginalText = viewModel.RefContentText;
                             break;
                         case MessageBoxResult.No:
                             break;
@@ -76,12 +88,12 @@ namespace D2MTranslator
                     }
                 }
             }
-            if (e.PropertyName == nameof(MainViewModel.ModText))
+            if (e.PropertyName == nameof(JsonFileViewModel.ModContentText))
             {
                 if (modOriginalText == null || modOriginalText == string.Empty || modOriginalText == modEditor.Text)
                 {
-                    modEditor.Text = viewModel.ModText;
-                    modOriginalText = viewModel.ModText;
+                    modEditor.Text = viewModel.ModContentText;
+                    modOriginalText = viewModel.ModContentText;
                 } else
                 {
                     /** create new dialog and ask user if they want to overwrite
@@ -90,8 +102,8 @@ namespace D2MTranslator
                     switch (result)
                     {
                         case MessageBoxResult.Yes:
-                            modEditor.Text = viewModel.ModText;
-                            modOriginalText = viewModel.ModText;
+                            modEditor.Text = viewModel.ModContentText;
+                            modOriginalText = viewModel.ModContentText;
                             break;
                         case MessageBoxResult.No:
                             break;

@@ -1,4 +1,5 @@
-﻿using D2MTranslator.ViewModels.Models;
+﻿using D2MTranslator.Models;
+using D2MTranslator.ViewModels;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,8 +12,10 @@ namespace D2MTranslator
     public partial class MainWindow : Window
     {
 
-        public MainWindow()
+        public MainWindow(FileSystemViewModel mvm)
         {
+            
+            DataContext = mvm;
             InitializeComponent();
         }
 
