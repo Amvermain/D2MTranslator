@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace D2MTranslator.ViewModels.Models
+namespace D2MTranslator.Models
 {
     public class FileSystemItem
     {

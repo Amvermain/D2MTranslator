@@ -1,4 +1,6 @@
-﻿namespace D2MTranslator.ViewModels.Models
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace D2MTranslator.Models
 {
     public class LineItem : ObservableObject
     {

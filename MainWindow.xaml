@@ -8,9 +8,9 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Diablo 2 Mod Translator" Height="450" Width="800">
-    <Window.DataContext>
+    <!--<Window.DataContext>
         <vm:MainViewModel/>
-    </Window.DataContext>
+    </Window.DataContext>-->
 
     <Grid>
         <Grid.RowDefinitions>
@@ -97,7 +97,7 @@
             </Grid>
 
             <Grid Grid.Column="1" Grid.ColumnSpan="2" Grid.RowSpan="2">
-                <local:TextView ModText="{Binding ModContentText}" RefText="{Binding RefContentText}"/>
+                <local:TranslationEditor/>
             </Grid>
 
             
