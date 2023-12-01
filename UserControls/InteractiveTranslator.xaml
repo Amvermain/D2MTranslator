@@ -3,10 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:D2MTranslator"
+             xmlns:local="clr-namespace:D2MTranslator.UserControls"
+             xmlns:models="clr-namespace:D2MTranslator.Models"
+             xmlns:viewmodel="clr-namespace:D2MTranslator.ViewModels"
+             d:DataContext="{d:DesignInstance Type=viewmodel:InteractiveViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid Background="White">
-        
+        <TreeView x:Name="translationItemsTreeView" ItemsSource="{Binding TranslationItems}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type models:TranslationItem}" ItemsSource="{Binding SubItems}">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- 제목으로 사용할 요소들 -->
+                        <TextBlock Text="{Binding id}" Margin="5,0"/>
+                        <TextBlock Text="{Binding Key}" Margin="5,0"/>
+                        <TextBlock Text="{Binding enUS}" Margin="5,0"/>
+                    </StackPanel>
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <!-- 나머지 요소들 (선택적으로 표시) -->
+                                <TextBlock Text="{Binding deDE}" Visibility="{Binding UserChoiceVisibility}" Margin="5,0"/>
+                                <!-- 다른 언어에 대한 바인딩 추가 -->
+                            </StackPanel>
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
     </Grid>
 </UserControl>

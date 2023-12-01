@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace D2MTranslator.Models
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:명명 스타일", Justification = "<보류 중>")]
     [Serializable]
-    public class TranslationItem
+    public class TranslationItem: ObservableObject
     {
         public int id { get; set; }
         public string Key { get; set; }

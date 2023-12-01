@@ -14,12 +14,12 @@ namespace D2MTranslator.UserControls
         {
             if (DesignerProperties.GetIsInDesignMode(this))
             {
-                DataContext = new JsonFileViewModel();
+                DataContext = new InteractiveViewModel();
                 InitializeComponent();
             }
             else
             {
-                DataContext = App.Kernel.Get<JsonFileViewModel>();
+                DataContext = App.Kernel.Get<InteractiveViewModel>();
                 InitializeComponent();
             }
         }
