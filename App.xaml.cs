@@ -1,6 +1,5 @@
 ﻿using D2MTranslator.ViewModels;
 using Ninject;
-using System;
 using System.Windows;
 
 namespace D2MTranslator
@@ -27,6 +26,7 @@ namespace D2MTranslator
         {
             Kernel.Bind<FileSystemViewModel>().ToSelf().InSingletonScope();
             Kernel.Bind<JsonFileViewModel>().ToSelf().InSingletonScope();
+            Kernel.Bind<MainViewModel>().ToSelf().InSingletonScope();
         }
     }
 }

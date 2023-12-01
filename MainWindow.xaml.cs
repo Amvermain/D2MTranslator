@@ -12,9 +12,9 @@ namespace D2MTranslator
     public partial class MainWindow : Window
     {
 
-        public MainWindow(FileSystemViewModel mvm)
+        public MainWindow(MainViewModel mvm)
         {
-            
+
             DataContext = mvm;
             InitializeComponent();
         }
@@ -24,7 +24,7 @@ namespace D2MTranslator
             Debug.WriteLine("OnTrOriginalSelectedItemChanged");
             if (e.NewValue is FileSystemItem selectedFile)
             {
-                SelectItemInTreeView(trReference, selectedFile.Name);
+                //SelectItemInTreeView(trReference, selectedFile.Name);
             }
         }
 
@@ -63,5 +63,17 @@ namespace D2MTranslator
             return false;
         }
 
+        // TODO: Change TabControl to ContentControl
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                var tabControl = sender as TabControl;
+                TabItem? selectedTab = tabControl.SelectedItem as TabItem;
+
+                if (selectedTab == null)
+                    return;
+            }
+        }
     }
 }

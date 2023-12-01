@@ -2,16 +2,24 @@
 using CommunityToolkit.Mvvm.Messaging;
 using D2MTranslator.Models;
 using D2MTranslator.ViewModels.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace D2MTranslator.ViewModels
 {
-    public class JsonFileViewModel: ObservableObject
+    public class JsonFileViewModel : ObservableObject
     {
+
+
+        private bool _isModified;
+        public bool IsModified
+        {
+            get => _isModified;
+            set
+            {
+                _isModified = value;
+                OnPropertyChanged(nameof(IsModified));
+            }
+        }
 
         public JsonFileViewModel()
         {
@@ -21,7 +29,7 @@ namespace D2MTranslator.ViewModels
                 {
                     ModContentText = m.Content;
                 }
-                else if(m.FolderType == Enums.FolderType.Reference)
+                else if (m.FolderType == Enums.FolderType.Reference)
                 {
                     RefContentText = m.Content;
                 }

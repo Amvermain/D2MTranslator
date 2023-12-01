@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Messages;
 using D2MTranslator.Models;
 using D2MTranslator.ViewModels.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -10,6 +12,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
+using static D2MTranslator.Enums;
 
 namespace D2MTranslator.ViewModels
 {
@@ -21,6 +24,7 @@ namespace D2MTranslator.ViewModels
         private FileSystemItem? _selectedModItem;
         private FileSystemItem? _selectedRefItem;
 
+        
         public FileSystemItem SelectedModItem
         {
             get => _selectedModItem;
@@ -44,17 +48,13 @@ namespace D2MTranslator.ViewModels
         }
 
 
-        private List<string>? _visibleProperties;
-
-        public ICommand OpenModFolderCommand { get; private set; }
-        public ICommand OpenRefFolderCommand { get; private set; }
 
         public ICommand OpenSelectModFile { get; private set; }
         public ICommand OpenSelectRefFile { get; private set; }
 
 
 
-        private void ExecuteOpenFile(RoutedPropertyChangedEventArgs<object> param, Enums.FolderType mod)
+        private void ExecuteOpenFile(RoutedPropertyChangedEventArgs<object> param, FolderType mod)
         {
             if (param.NewValue is FileSystemItem selectedItem)
             {
@@ -65,12 +65,12 @@ namespace D2MTranslator.ViewModels
                     var fileContent = File.ReadAllText(fullPath);
                     if (mod == Enums.FolderType.Mod)
                     {
-                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, Enums.FolderType.Mod));
+                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Mod));
                         //LoadJsonAsLines(fileContent, ModLines);
                     }
                     else if (mod == Enums.FolderType.Reference)
                     {
-                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, Enums.FolderType.Reference));
+                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Reference));
                         //LoadJsonAsLines(fileContent, RefLines);
                     }
                 }
@@ -88,26 +88,7 @@ namespace D2MTranslator.ViewModels
 
         }
 
-        private void ExecuteOpenFolder(object parameter, Enums.FolderType type)
-        {
-            CommonOpenFileDialog dialog = new()
-            {
-                IsFolderPicker = true,
-                Multiselect = false
-            };
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                if (dialog.FileName == null)
-                {
-                    return;
-                }
-
-                if (type == Enums.FolderType.Mod)
-                    PopulateTreeViewWithJsonFiles(dialog.FileName, OriginalItems);
-                else if (type == Enums.FolderType.Reference)
-                    PopulateTreeViewWithJsonFiles(dialog.FileName, ReferenceItems);
-            }
-        }
+        
 
         private void PopulateTreeViewWithJsonFiles(string folderPath, ObservableCollection<FileSystemItem> target)
         {
@@ -146,12 +127,31 @@ namespace D2MTranslator.ViewModels
 
         public FileSystemViewModel()
         {
-            OpenModFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, Enums.FolderType.Mod));
-            OpenRefFolderCommand = new RelayCommand(param => ExecuteOpenFolder(param, Enums.FolderType.Reference));
-            OpenSelectModFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, Enums.FolderType.Mod));
-            OpenSelectRefFile = new RelayCommand(param => ExecuteOpenFile((RoutedPropertyChangedEventArgs<object>)param, Enums.FolderType.Reference));
+            
+            OpenSelectModFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Mod));
+            OpenSelectRefFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Reference));
+            SaveModFileCommand = new RelayCommand<string>(SaveModFile);
+
+            WeakReferenceMessenger.Default.Register<FileOperationMessage>(this, (r, m) =>
+            {
+                Debug.WriteLine("message called");
+                if (m.FolderType == FolderType.Mod)
+                {
+                    PopulateTreeViewWithJsonFiles(m.FilePath, OriginalItems);
+                }
+                else if (m.FolderType == FolderType.Reference)
+                {
+                    PopulateTreeViewWithJsonFiles(m.FilePath, ReferenceItems);
+                }
+            });
         }
 
+        public ICommand SaveModFileCommand { get; private set; }
+
+        private void SaveModFile(object commandParameter)
+        {
+
+        }
     }
 
 }

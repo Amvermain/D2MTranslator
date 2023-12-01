@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace D2MTranslator
+namespace D2MTranslator.UserControls
 {
     /// <summary>
     /// TextView.xaml에 대한 상호 작용 논리
@@ -20,12 +20,13 @@ namespace D2MTranslator
 
         public TranslationEditor()
         {
-            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (DesignerProperties.GetIsInDesignMode(this))
             {
                 DataContext = new JsonFileViewModel();
                 InitializeComponent();
                 this.Loaded += OnLoaded;
-            } else
+            }
+            else
             {
                 DataContext = App.Kernel.Get<JsonFileViewModel>();
                 InitializeComponent();
@@ -45,7 +46,7 @@ namespace D2MTranslator
             set { SetValue(RefTextProperty, value); }
         }
 
-        
+
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -67,10 +68,11 @@ namespace D2MTranslator
             if (e.PropertyName == nameof(JsonFileViewModel.RefContentText))
             {
                 if (refOriginalText == null || refOriginalText == string.Empty || refOriginalText == refEditor.Text)
-                {       
+                {
                     refEditor.Text = viewModel.RefContentText;
                     refOriginalText = viewModel.RefContentText;
-                } else
+                }
+                else
                 {
                     /** create new dialog and ask user if they want to overwrite
                      */
@@ -94,7 +96,8 @@ namespace D2MTranslator
                 {
                     modEditor.Text = viewModel.ModContentText;
                     modOriginalText = viewModel.ModContentText;
-                } else
+                }
+                else
                 {
                     /** create new dialog and ask user if they want to overwrite
                      *                     */

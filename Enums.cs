@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace D2MTranslator
+﻿namespace D2MTranslator
 {
     public static class Enums
     {
@@ -12,6 +6,18 @@ namespace D2MTranslator
         {
             Mod,
             Reference
+        }
+
+        public enum ViewMode
+        {
+            Notepad,
+            Interactive
+        }
+
+        public enum FileOperation
+        {
+            Open,
+            Save
         }
     }
 }
