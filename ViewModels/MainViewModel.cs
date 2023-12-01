@@ -26,14 +26,15 @@ namespace D2MTranslator.ViewModels
                 IsModified = m.IsModified;
             });
             CurrentViewModel = App.Kernel.Get<JsonFileViewModel>();
-
             OpenModFolderCommand = new RelayCommand(() => ExecuteOpenFolder(FolderType.Mod));
             OpenRefFolderCommand = new RelayCommand(() => ExecuteOpenFolder(FolderType.Reference));
+            ChangeViewCommand = new RelayCommand<string>((type) => ChangeView(type));
         }
 
 
         public ICommand OpenModFolderCommand { get; private set; }
         public ICommand OpenRefFolderCommand { get; private set; }
+        public ICommand ChangeViewCommand { get; private set; } //=> changeViewCommand ??= new RelayCommand(ChangeView);
 
         private object currentViewModel;
         public object CurrentViewModel { get => currentViewModel; set => SetProperty(ref currentViewModel, value); }
@@ -52,9 +53,20 @@ namespace D2MTranslator.ViewModels
                     return;
                 }
 
-                Debug.WriteLine("message sent!");
                 WeakReferenceMessenger.Default.Send(new FileOperationMessage(FileOperation.Open, dialog.FileName, type));
                 
+            }
+        }
+
+        private void ChangeView(string type)
+        {
+            if (type == "Editor")
+            {
+                CurrentViewModel = App.Kernel.Get<JsonFileViewModel>();
+                
+            } else if (type == "Interactive")
+            {
+                CurrentViewModel = App.Kernel.Get<InteractiveViewModel>();
             }
         }
     }

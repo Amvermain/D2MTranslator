@@ -19,32 +19,6 @@ namespace D2MTranslator
             InitializeComponent();
         }
 
-        private void OnTrOriginalSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            Debug.WriteLine("OnTrOriginalSelectedItemChanged");
-            if (e.NewValue is FileSystemItem selectedFile)
-            {
-                //SelectItemInTreeView(trReference, selectedFile.Name);
-            }
-        }
-
-        private void OnTrReferenceSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            Debug.WriteLine("OnTrReferenceSelectedItemChanged");
-            //LoadFileContent(e.NewValue as FileSystemItem, txtReference);
-        }
-
-
-
-        private void SelectItemInTreeView(TreeView treeView, string fileName)
-        {
-            foreach (FileSystemItem item in treeView.Items)
-            {
-                if (FindAndSelectItem(item, fileName))
-                    break;
-            }
-        }
-
         private bool FindAndSelectItem(FileSystemItem item, string fileName)
         {
             if (item.Name == fileName)
@@ -61,19 +35,6 @@ namespace D2MTranslator
             }
 
             return false;
-        }
-
-        // TODO: Change TabControl to ContentControl
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.Source is TabControl)
-            {
-                var tabControl = sender as TabControl;
-                TabItem? selectedTab = tabControl.SelectedItem as TabItem;
-
-                if (selectedTab == null)
-                    return;
-            }
         }
     }
 }

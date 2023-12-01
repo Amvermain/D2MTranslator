@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:D2MTranslator"
              xmlns:vm="clr-namespace:D2MTranslator.ViewModels"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -18,7 +19,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Label Content="Reference Text" Grid.Row="0"/>
-            <avalonEdit:TextEditor Grid.Row="1"  xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" Name="refEditor" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"/>
+            <avalonEdit:TextEditor Grid.Row="1" Name="refEditor" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True" TextChanged="RefTextChanged"/>
         </Grid>
 
         <Grid Grid.Column="1">
@@ -27,7 +28,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Label Content="Original Text" Grid.Row="0"/>
-            <avalonEdit:TextEditor Grid.Row="1"  xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" Name="modEditor" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True"/>
+            <avalonEdit:TextEditor Grid.Row="1" Name="modEditor" SyntaxHighlighting="Json" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True" TextChanged="ModTextChanged"/>
         </Grid>
     </Grid>
 </UserControl>

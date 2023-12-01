@@ -1,18 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Messages;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace D2MTranslator.Models
 {
-    public class FileSystemItem
+    public class FileSystemItem: ObservableObject
     {
         public string Name { get; set; }
         public List<FileSystemItem> Items { get; set; } = new List<FileSystemItem>();
         public bool IsExpanded { get; set; } = true;
         public string ParentPath { get; internal set; }
+        public Enums.FolderType FolderType { get; set; }
 
-        public FileSystemItem(string name, string parentPath)
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (SetProperty(ref _isSelected, value))
+                {
+                    Debug.WriteLine("Selected Changed");
+                    OnSelectedChanged();
+                }
+            }
+        }
+
+        private void OnSelectedChanged()
+        {
+            // 파일 선택 변경시 실행될 로직
+            // 예: FileSystemViewModel에 알림
+            if (IsSelected == true)
+                WeakReferenceMessenger.Default.Send(new FileItemSelectedMessage(this));
+        }
+
+        public FileSystemItem(string name, string parentPath, Enums.FolderType folderType)
         {
             Name = name;
             ParentPath = parentPath;
+            FolderType = folderType;
         }
     }
 

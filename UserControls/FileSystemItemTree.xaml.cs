@@ -1,4 +1,5 @@
-﻿using D2MTranslator.ViewModels;
+﻿using D2MTranslator.Models;
+using D2MTranslator.ViewModels;
 using Ninject;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,12 @@
-﻿using D2MTranslator.ViewModels;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Messages;
+using D2MTranslator.Utility;
+using D2MTranslator.ViewModels;
 using ICSharpCode.AvalonEdit.Search;
 using Ninject;
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,38 +18,22 @@ namespace D2MTranslator.UserControls
     public partial class TranslationEditor : UserControl
     {
 
-        public static readonly DependencyProperty ModTextProperty = DependencyProperty.Register(
-    "ModText", typeof(string), typeof(TranslationEditor), new PropertyMetadata(default(string)));
-        public static readonly DependencyProperty RefTextProperty = DependencyProperty.Register(
-    "RefText", typeof(string), typeof(TranslationEditor), new PropertyMetadata(default(string)));
-
         public TranslationEditor()
         {
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 DataContext = new JsonFileViewModel();
                 InitializeComponent();
-                this.Loaded += OnLoaded;
+                Loaded += OnLoaded;
             }
             else
             {
                 DataContext = App.Kernel.Get<JsonFileViewModel>();
                 InitializeComponent();
-                this.Loaded += OnLoaded;
+                Loaded += OnLoaded;
             }
         }
 
-        public string ModText
-        {
-            get { return (string)GetValue(ModTextProperty); }
-            set { SetValue(ModTextProperty, value); }
-        }
-
-        public string RefText
-        {
-            get { return (string)GetValue(RefTextProperty); }
-            set { SetValue(RefTextProperty, value); }
-        }
 
 
 
@@ -59,62 +48,35 @@ namespace D2MTranslator.UserControls
 
         }
 
-        string refOriginalText;
-        string modOriginalText;
-
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var viewModel = sender as JsonFileViewModel;
             if (e.PropertyName == nameof(JsonFileViewModel.RefContentText))
             {
-                if (refOriginalText == null || refOriginalText == string.Empty || refOriginalText == refEditor.Text)
-                {
-                    refEditor.Text = viewModel.RefContentText;
-                    refOriginalText = viewModel.RefContentText;
-                }
-                else
-                {
-                    /** create new dialog and ask user if they want to overwrite
-                     */
-                    MessageBoxResult result = MessageBox.Show("Do you want to overwrite?", "Overwrite", MessageBoxButton.YesNoCancel);
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            refEditor.Text = viewModel.RefContentText;
-                            refOriginalText = viewModel.RefContentText;
-                            break;
-                        case MessageBoxResult.No:
-                            break;
-                        case MessageBoxResult.Cancel:
-                            break;
-                    }
-                }
-            }
-            if (e.PropertyName == nameof(JsonFileViewModel.ModContentText))
+
+                refEditor.Text = viewModel.RefContentText;
+            } else if (e.PropertyName == nameof(JsonFileViewModel.ModContentText))
             {
-                if (modOriginalText == null || modOriginalText == string.Empty || modOriginalText == modEditor.Text)
-                {
-                    modEditor.Text = viewModel.ModContentText;
-                    modOriginalText = viewModel.ModContentText;
-                }
-                else
-                {
-                    /** create new dialog and ask user if they want to overwrite
-                     *                     */
-                    MessageBoxResult result = MessageBox.Show("Do you want to overwrite?", "Overwrite", MessageBoxButton.YesNoCancel);
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            modEditor.Text = viewModel.ModContentText;
-                            modOriginalText = viewModel.ModContentText;
-                            break;
-                        case MessageBoxResult.No:
-                            break;
-                        case MessageBoxResult.Cancel:
-                            break;
-                    }
-                }
+                modEditor.Text = viewModel.ModContentText;
             }
+            
+        }
+
+        private Debouncer debouncer = new Debouncer();
+
+        private void ModTextChanged(object sender, System.EventArgs e)
+        {
+            debouncer.Debounce(1000, () =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    WeakReferenceMessenger.Default.Send(new ModTextChangedMessage(modEditor.Text));
+                });
+            });
+        }
+
+        private void RefTextChanged(object sender, System.EventArgs e)
+        {
         }
 
         //public string ModText

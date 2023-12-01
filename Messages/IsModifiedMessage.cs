@@ -1,6 +1,6 @@
 ﻿namespace D2MTranslator.ViewModels
 {
-    internal class IsModifiedMessage
+    public class IsModifiedMessage
     {
         public bool IsModified { get; internal set; }
 

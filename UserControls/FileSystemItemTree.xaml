@@ -21,11 +21,11 @@
             </Grid.RowDefinitions>
             <Label Content="Mod Contents" Grid.Row="0"/>
             <TreeView x:Name="trOriginal" Grid.Row="1" ItemsSource="{Binding OriginalItems}">
-                <i:Interaction.Triggers>
+                <!--<i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding OpenSelectModFile}" PassEventArgsToCommand="True"/>
                     </i:EventTrigger>
-                </i:Interaction.Triggers>
+                </i:Interaction.Triggers>-->
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
@@ -33,7 +33,12 @@
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                        <TextBlock Text="{Binding Name}"/>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton GroupName="Mod" IsChecked="{Binding IsSelected}" VerticalAlignment="Center"
+             Command="{Binding IsSelected}">
+                            </RadioButton>
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
@@ -46,11 +51,11 @@
             </Grid.RowDefinitions>
             <Label Content="Reference Contents" Grid.Row="0"/>
             <TreeView x:Name="trReference" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding ReferenceItems}">
-                <i:Interaction.Triggers>
+                <!--<i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding OpenSelectRefFile}" PassEventArgsToCommand="True"/>
                     </i:EventTrigger>
-                </i:Interaction.Triggers>
+                </i:Interaction.Triggers>-->
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
@@ -58,7 +63,10 @@
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                        <TextBlock Text="{Binding Name}"/>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton GroupName="Ref" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>

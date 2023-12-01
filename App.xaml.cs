@@ -27,6 +27,7 @@ namespace D2MTranslator
             Kernel.Bind<FileSystemViewModel>().ToSelf().InSingletonScope();
             Kernel.Bind<JsonFileViewModel>().ToSelf().InSingletonScope();
             Kernel.Bind<MainViewModel>().ToSelf().InSingletonScope();
+            Kernel.Bind<InteractiveViewModel>().ToSelf().InSingletonScope();
         }
     }
 }

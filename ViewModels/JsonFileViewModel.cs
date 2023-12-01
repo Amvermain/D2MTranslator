@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Messages;
 using D2MTranslator.Models;
 using D2MTranslator.ViewModels.Models;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace D2MTranslator.ViewModels
             set
             {
                 _isModified = value;
+                WeakReferenceMessenger.Default.Send(new IsModifiedMessage(value));
                 OnPropertyChanged(nameof(IsModified));
             }
         }
@@ -25,14 +27,18 @@ namespace D2MTranslator.ViewModels
         {
             WeakReferenceMessenger.Default.Register<FileContentMessage>(this, (r, m) =>
             {
-                if (m.FolderType == Enums.FolderType.Mod)
-                {
-                    ModContentText = m.Content;
-                }
-                else if (m.FolderType == Enums.FolderType.Reference)
-                {
-                    RefContentText = m.Content;
-                }
+            if (m.FolderType == Enums.FolderType.Mod)
+            {
+                ModContentText = m.Content;
+                ModContentOriginalText = m.Content;
+                IsModified = false;
+            }
+            else if (m.FolderType == Enums.FolderType.Reference)
+            {
+                RefContentText = m.Content;
+            }
+            WeakReferenceMessenger.Default.Send(new FileOpenFinishMessage());
+                
             });
         }
 
@@ -65,9 +71,11 @@ namespace D2MTranslator.ViewModels
             set
             {
                 _modContentText = value;
+                IsModified = ModContentOriginalText != ModContentText;
                 OnPropertyChanged(nameof(ModContentText));
             }
         }
+        public string ModContentOriginalText { get; set; } = "";
         public string RefContentText
         {
             get => _refContentText;

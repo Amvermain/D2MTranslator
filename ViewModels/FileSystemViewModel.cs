@@ -5,6 +5,7 @@ using D2MTranslator.Messages;
 using D2MTranslator.Models;
 using D2MTranslator.ViewModels.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -49,33 +50,12 @@ namespace D2MTranslator.ViewModels
 
 
 
-        public ICommand OpenSelectModFile { get; private set; }
-        public ICommand OpenSelectRefFile { get; private set; }
+        //public ICommand OpenSelectModFile { get; private set; }
+        //public ICommand OpenSelectRefFile { get; private set; }
 
 
 
-        private void ExecuteOpenFile(RoutedPropertyChangedEventArgs<object> param, FolderType mod)
-        {
-            if (param.NewValue is FileSystemItem selectedItem)
-            {
-                var fullPath = selectedItem.ParentPath + "\\" + selectedItem.Name;
-                Debug.WriteLine(fullPath);
-                if (File.Exists(fullPath))
-                {
-                    var fileContent = File.ReadAllText(fullPath);
-                    if (mod == Enums.FolderType.Mod)
-                    {
-                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Mod));
-                        //LoadJsonAsLines(fileContent, ModLines);
-                    }
-                    else if (mod == Enums.FolderType.Reference)
-                    {
-                        WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Reference));
-                        //LoadJsonAsLines(fileContent, RefLines);
-                    }
-                }
-            }
-        }
+        
 
         private static string ConvertToJsonString(List<TranslationItem> items)
         {
@@ -90,25 +70,25 @@ namespace D2MTranslator.ViewModels
 
         
 
-        private void PopulateTreeViewWithJsonFiles(string folderPath, ObservableCollection<FileSystemItem> target)
+        private void PopulateTreeViewWithJsonFiles(string folderPath, ObservableCollection<FileSystemItem> target, FolderType folderType)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(folderPath);
-            var rootItem = CreateFileSystemItem(dirInfo);
+            var rootItem = CreateFileSystemItem(dirInfo, folderType);
             target.Add(rootItem);
         }
 
-        private FileSystemItem CreateFileSystemItem(DirectoryInfo directoryInfo)
+        private FileSystemItem CreateFileSystemItem(DirectoryInfo directoryInfo, FolderType folderType)
         {
-            var item = new FileSystemItem(directoryInfo.Name, directoryInfo.FullName);
+            var item = new FileSystemItem(directoryInfo.Name, directoryInfo.FullName, folderType);
 
             foreach (var dir in directoryInfo.GetDirectories())
             {
-                item.Items.Add(CreateFileSystemItem(dir));
+                item.Items.Add(CreateFileSystemItem(dir, folderType));
             }
 
             foreach (var file in directoryInfo.GetFiles("*.json"))
             {
-                item.Items.Add(new FileSystemItem(file.Name, directoryInfo.FullName));
+                item.Items.Add(new FileSystemItem(file.Name, directoryInfo.FullName, folderType));
             }
 
             return item;
@@ -127,31 +107,106 @@ namespace D2MTranslator.ViewModels
 
         public FileSystemViewModel()
         {
-            
-            OpenSelectModFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Mod));
-            OpenSelectRefFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Reference));
-            SaveModFileCommand = new RelayCommand<string>(SaveModFile);
+            InitiateRelayCommands();
+            RegisterMessages();
+        }
 
+        private void InitiateRelayCommands()
+        {
+            //OpenSelectModFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Mod));
+            //OpenSelectRefFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Reference));
+            SaveModFileCommand = new RelayCommand<string>(SaveModFile);
+        }
+
+        private void RegisterMessages()
+        {
+            WeakReferenceMessenger.Default.Register<FileItemSelectedMessage>(this, OnFileItemSelected);
             WeakReferenceMessenger.Default.Register<FileOperationMessage>(this, (r, m) =>
             {
-                Debug.WriteLine("message called");
                 if (m.FolderType == FolderType.Mod)
                 {
-                    PopulateTreeViewWithJsonFiles(m.FilePath, OriginalItems);
+                    PopulateTreeViewWithJsonFiles(m.FilePath, OriginalItems, FolderType.Mod);
                 }
                 else if (m.FolderType == FolderType.Reference)
                 {
-                    PopulateTreeViewWithJsonFiles(m.FilePath, ReferenceItems);
+                    PopulateTreeViewWithJsonFiles(m.FilePath, ReferenceItems ,FolderType.Reference);
                 }
+            });
+            WeakReferenceMessenger.Default.Register<IsModifiedMessage>(this, (r, m) =>
+            {
+                Debug.WriteLine("IsModifiedMessage Changed To " + m.IsModified);
+                isChanged = m.IsModified;
+            });
+            WeakReferenceMessenger.Default.Register<FileOpenFinishMessage>(this, (r, m) =>
+            {
+                Debug.WriteLine("FileOpenFinishMessage / " + preservedPreviousItem.Name + " / " + PreviousSelectedItem?.Name);
+                PreviousSelectedItem = preservedPreviousItem;
             });
         }
 
         public ICommand SaveModFileCommand { get; private set; }
+        FileSystemItem preservedPreviousItem;
+        public FileSystemItem PreviousSelectedItem
+        {
+            get => _previousSelectedItem; 
+            set
+            {
+                Debug.WriteLine("who touch it?");
+                _previousSelectedItem = value;
+            }
+        }
 
         private void SaveModFile(object commandParameter)
         {
 
         }
+
+        private FileSystemItem _previousSelectedItem;
+
+        private void OnFileItemSelected(object recipient, FileItemSelectedMessage message)
+        {
+            Debug.WriteLine("OnFileItemSelected");
+            if (PreviousSelectedItem == message.Item)
+                return;
+
+            if (isChanged)
+            {
+                // 사용자에게 변경사항 폐기 여부 확인
+                if (MessageBox.Show("Are you sure you want to discard your changes?", "Change Discard", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                {
+                    message.Item.IsSelected = false;
+                    PreviousSelectedItem.IsSelected = true;
+                    return;
+                }
+            }
+
+            // 파일 열기 로직 또는 다른 처리...
+            preservedPreviousItem = message.Item;
+            ExecuteOpenFile(message);
+            
+        }
+
+        private void ExecuteOpenFile(FileItemSelectedMessage message)
+        {
+            var selectedItem = message.Item;
+            var fullPath = selectedItem.ParentPath + "\\" + selectedItem.Name;
+            Debug.WriteLine(fullPath);
+            if (File.Exists(fullPath))
+            {
+                var fileContent = File.ReadAllText(fullPath);
+                var mod = selectedItem.FolderType;
+                if (mod == FolderType.Mod)
+                {
+                    WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Mod));
+                }
+                else if (mod == Enums.FolderType.Reference)
+                {
+                    WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Reference));
+                }
+            }
+        }
+
+        private bool isChanged = false;
     }
 
 }
