@@ -199,7 +199,7 @@ namespace D2MTranslator.ViewModels
                 {
                     WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Mod));
                 }
-                else if (mod == Enums.FolderType.Reference)
+                else if (mod == FolderType.Reference)
                 {
                     WeakReferenceMessenger.Default.Send(new FileContentMessage(fileContent, FolderType.Reference));
                 }

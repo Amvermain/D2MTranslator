@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="D2MTranslator.UserControls.InteractiveTranslatorTreeViewItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:D2MTranslator.UserControls"
+             xmlns:models="clr-namespace:D2MTranslator.Models"
+             xmlns:converters="clr-namespace:D2MTranslator.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=models:TranslationItem, IsDesignTimeCreatable=True}"             
+             >
+    <UserControl.Resources>
+        <converters:WidthMinusConverter x:Key="WidthMinusConverter"/>
+        <Style TargetType="TextBox">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=ActualWidth, Converter={StaticResource WidthMinusConverter}, ConverterParameter=100d}"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=ActualWidth, Converter={StaticResource WidthMinusConverter}, ConverterParameter=100d}"/>
+        </Style>
+
+
+    </UserControl.Resources>
+    <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch">
+        <Expander.Header>
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="id : " VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding id}" Margin="5,0"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="key : " VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Key}" Margin="5,0"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="enUS : " VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding enUS}" Margin="5,0"/>
+            </Grid>
+        </Expander.Header>
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="deDE : "/>
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding deDE, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="esES : "/>
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding esES, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="esMX : "/>
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding esMX, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Text="frFR : "/>
+            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding frFR, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="itIT : "/>
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding itIT, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" Text="jaJP : "/>
+            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding jaJP, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" Text="koKR : "/>
+            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding koKR, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" Text="plPL : "/>
+            <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding plPL, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" Text="ptBR : "/>
+            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding ptBR, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="9" VerticalAlignment="Center" Text="ruRU : "/>
+            <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding ruRU, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Text="zhCN : "/>
+            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding zhCN, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Text="zhTW : "/>
+            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding zhTW, Mode=TwoWay}" Margin="5.0"/>
+        </Grid>
+    </Expander>
+</UserControl>

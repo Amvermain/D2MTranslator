@@ -40,6 +40,8 @@ namespace D2MTranslator.ViewModels
 
                 WeakReferenceMessenger.Default.Send(new FileOpenFinishMessage());
             });
+            var item = new TranslationItem(0, "key", "test");
+            TranslationItems.Add(item);
         }
         
     }
