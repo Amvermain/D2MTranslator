@@ -12,20 +12,22 @@
              >
     <UserControl.Resources>
         <converters:WidthMinusConverter x:Key="WidthMinusConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <Style TargetType="TextBox">
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=ActualWidth, Converter={StaticResource WidthMinusConverter}, ConverterParameter=100d}"/>
+            <Setter Property="Width" Value="Auto"/>
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=ActualWidth, Converter={StaticResource WidthMinusConverter}, ConverterParameter=100d}"/>
+            <Setter Property="Width" Value="Auto"/>
         </Style>
-
-
     </UserControl.Resources>
-    <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch">
+    <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch" Visibility="{Binding IsValid, Converter={StaticResource BooleanToVisibilityConverter}}">
         <Expander.Header>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
@@ -42,13 +44,37 @@
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="key : " VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Key}" Margin="5,0"/>
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="enUS : " VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding enUS}" Margin="5,0"/>
+                <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding enUS}" IsReadOnly="True" Margin="5,0"/>
             </Grid>
         </Expander.Header>
         <Grid HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="Auto"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding referenceItem}" Value="{x:Null}">
+                                    <Setter Property="Width" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="*"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding referenceItem}" Value="{x:Null}">
+                                    <Setter Property="Width" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -64,30 +90,65 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="deDE : "/>
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding deDE, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="esES : "/>
-            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding esES, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="esMX : "/>
-            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding esMX, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Text="frFR : "/>
-            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding frFR, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="itIT : "/>
-            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding itIT, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" Text="jaJP : "/>
-            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding jaJP, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" Text="koKR : "/>
-            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding koKR, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" Text="plPL : "/>
-            <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding plPL, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" Text="ptBR : "/>
-            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding ptBR, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="9" VerticalAlignment="Center" Text="ruRU : "/>
-            <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding ruRU, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Text="zhCN : "/>
-            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding zhCN, Mode=TwoWay}" Margin="5.0"/>
-            <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Text="zhTW : "/>
-            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding zhTW, Mode=TwoWay}" Margin="5.0"/>
+            <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="deDE : " Visibility="{Binding LanguageVisibility[deDE], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding deDE, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[deDE], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="0" Command="{Binding OverwriteCommand}" CommandParameter="deDE" Visibility="{Binding LanguageVisibility[deDE], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding referenceItem.deDE}" Margin="5.0" Visibility="{Binding LanguageVisibility[deDE], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="esES : " Visibility="{Binding LanguageVisibility[esES], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding esES, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[esES], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="1" Command="{Binding OverwriteCommand}" CommandParameter="esES" Visibility="{Binding LanguageVisibility[esES], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding referenceItem.esES}" Margin="5.0" Visibility="{Binding LanguageVisibility[esES], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="esMX : " Visibility="{Binding LanguageVisibility[esMX], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding esMX, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[esMX], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="2" Command="{Binding OverwriteCommand}" CommandParameter="esMX" Visibility="{Binding LanguageVisibility[esMX], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding referenceItem.esMX}" Margin="5.0" Visibility="{Binding LanguageVisibility[esMX], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Text="frFR : " Visibility="{Binding LanguageVisibility[frFR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding frFR, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[frFR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="3" Command="{Binding OverwriteCommand}" CommandParameter="frFR" Visibility="{Binding LanguageVisibility[frFR], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding referenceItem.frFR}" Margin="5.0" Visibility="{Binding LanguageVisibility[frFR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="itIT : " Visibility="{Binding LanguageVisibility[itIT], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding itIT, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[itIT], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="4" Command="{Binding OverwriteCommand}" CommandParameter="itIT" Visibility="{Binding LanguageVisibility[itIT], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding referenceItem.itIT}" Margin="5.0" Visibility="{Binding LanguageVisibility[itIT], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" Text="jaJP : " Visibility="{Binding LanguageVisibility[jaJP], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding jaJP, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[jaJP], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="5" Command="{Binding OverwriteCommand}" CommandParameter="jaJP" Visibility="{Binding LanguageVisibility[jaJP], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="5" Text="{Binding referenceItem.jaJP}" Margin="5.0" Visibility="{Binding LanguageVisibility[jaJP], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" Text="koKR : " Visibility="{Binding LanguageVisibility[koKR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding koKR, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[koKR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="6" Command="{Binding OverwriteCommand}" CommandParameter="koKR" Visibility="{Binding LanguageVisibility[koKR], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="6" Text="{Binding referenceItem.koKR}" Margin="5.0" Visibility="{Binding LanguageVisibility[koKR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" Text="plPL : " Visibility="{Binding LanguageVisibility[plPL], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding plPL, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[plPL], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="7" Command="{Binding OverwriteCommand}" CommandParameter="plPL" Visibility="{Binding LanguageVisibility[plPL], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="7" Text="{Binding referenceItem.plPL}" Margin="5.0" Visibility="{Binding LanguageVisibility[plPL], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" Text="ptBR : " Visibility="{Binding LanguageVisibility[ptBR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding ptBR, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[ptBR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="8" Command="{Binding OverwriteCommand}" CommandParameter="ptBR" Visibility="{Binding LanguageVisibility[ptBR], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="8" Text="{Binding referenceItem.ptBR}" Margin="5.0" Visibility="{Binding LanguageVisibility[ptBR], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="9" VerticalAlignment="Center" Text="ruRU : " Visibility="{Binding LanguageVisibility[ruRU], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding ruRU, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[ruRU], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="9" Command="{Binding OverwriteCommand}" CommandParameter="ruRU" Visibility="{Binding LanguageVisibility[ruRU], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="9" Text="{Binding referenceItem.ruRU}" Margin="5.0" Visibility="{Binding LanguageVisibility[ruRU], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Text="zhCN : " Visibility="{Binding LanguageVisibility[zhCN], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding zhCN, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[zhCN], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="10" Command="{Binding OverwriteCommand}" CommandParameter="zhCN" Visibility="{Binding LanguageVisibility[zhCN], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="10" Text="{Binding referenceItem.zhCN}" Margin="5.0" Visibility="{Binding LanguageVisibility[zhCN], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="11" VerticalAlignment="Center" Text="zhTW : " Visibility="{Binding LanguageVisibility[zhTW], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding zhTW, Mode=TwoWay}" Margin="5.0" Visibility="{Binding LanguageVisibility[zhTW], Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Grid.Row="11" Command="{Binding OverwriteCommand}" CommandParameter="zhTW" Visibility="{Binding LanguageVisibility[zhTW], Converter={StaticResource BooleanToVisibilityConverter}}">←</Button>
+            <TextBlock Grid.Column="3" Grid.Row="11" Text="{Binding referenceItem.zhTW}" Margin="5.0" Visibility="{Binding LanguageVisibility[zhTW], Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </Grid>
     </Expander>
 </UserControl>

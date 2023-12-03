@@ -7,11 +7,21 @@
              xmlns:models="clr-namespace:D2MTranslator.Models"
              xmlns:viewmodel="clr-namespace:D2MTranslator.ViewModels"
              xmlns:converters="clr-namespace:D2MTranslator.Converters"
+             xmlns:selectors="clr-namespace:D2MTranslator.DataTemplateSelectors"
              d:DataContext="{d:DesignInstance Type=viewmodel:InteractiveViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <DataTemplate x:Key="ValidItemTemplate">
+            <local:InteractiveTranslatorTreeViewItem DataContext="{Binding}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="InvalidItemTemplate"/>
         <converters:WidthMinusConverter x:Key="WidthMinusConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <selectors:InteractiveTranslatorTreeSelector x:Key="InteractiveTranslatorTreeSelector"
+                                                     ValidTemplate="{StaticResource ValidItemTemplate}"
+                                                     InvalidTemplate="{StaticResource InvalidItemTemplate}"/>
+
         <Style TargetType="local:InteractiveTranslatorTreeViewItem">
             <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=ActualWidth, Converter={StaticResource WidthMinusConverter}, ConverterParameter=50.0}"/>
         </Style>
@@ -25,7 +35,9 @@
                     <ControlTemplate TargetType="TreeViewItem">
                         <Border BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}" 
+                                Visibility="{Binding IsVisible, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            >
                             <StackPanel>
                                 <ContentPresenter x:Name="PART_Header"
                                                   ContentSource="Header"
@@ -36,15 +48,22 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="Visibility" Value="{Binding IsValid, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </Style>
     </UserControl.Resources>
-    <Grid Background="White">
-        <TreeView x:Name="translationItemsTreeView" HorizontalAlignment="Stretch" ItemsSource="{Binding TranslationItems}">
-            <TreeView.ItemTemplate>
-                <DataTemplate>
-                    <local:InteractiveTranslatorTreeViewItem DataContext="{Binding}"/>
-                </DataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-    </Grid>
+
+    <TreeView x:Name="translationItemsTreeView" 
+          ItemsSource="{Binding TranslationItems}" 
+          ItemTemplateSelector="{StaticResource InteractiveTranslatorTreeSelector}"
+              VirtualizingPanel.IsVirtualizing="True"
+              >
+    </TreeView>
+    <!--<TreeView x:Name="translationItemsTreeView" HorizontalAlignment="Stretch" ItemsSource="{Binding TranslationItems}" VirtualizingPanel.IsVirtualizing="True">
+        <TreeView.ItemTemplate>
+            <DataTemplate>
+                <local:InteractiveTranslatorTreeViewItem DataContext="{Binding}"  Visibility="{Binding IsValid, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </DataTemplate>
+        </TreeView.ItemTemplate>
+    </TreeView>-->
+    
 </UserControl>

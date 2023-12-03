@@ -1,6 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using D2MTranslator.Messages;
+using D2MTranslator.Services;
+using Ninject;
 using System;
-using System.Printing;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using System.Windows.Input;
 
 namespace D2MTranslator.Models
 {
@@ -8,29 +18,85 @@ namespace D2MTranslator.Models
     [Serializable]
     public class TranslationItem : ObservableObject
     {
+        public bool IsValid
+        {
+            get
+            {
+                if (_configurationService.isHidingSameTranslation)
+                {
+                    return !IsVisibleElementsAreSame();
+                }
+                return true;
+            }
+        }
+
+        [JsonIgnore]
+        public Dictionary<string, bool> LanguageVisibility
+        {
+            get => _configurationService.LanguageVisibility;
+        }
+
+        private bool IsVisibleElementsAreSame()
+        {
+            if (referenceItem == null) return false;
+            bool result = true;
+            foreach (var property in typeof(TranslationItem).GetProperties())
+            {
+                
+                if (property.Name == "id" || property.Name == "Key" || property.Name == "enUS" || property.Name == "referenceItem" || property.Name == "IsValid" || property.Name == "IsExpanded")
+                    continue;
+                if (_configurationService.LanguageVisibility.ContainsKey(property.Name))
+                {
+                    if (_configurationService.LanguageVisibility[property.Name] == false) {
+                        continue; 
+                    }
+                }
+                var value = property.GetValue(this);
+                var referenceValue = property.GetValue(referenceItem);
+                if (value != null && referenceValue != null)
+                {
+                    if (value.ToString() != referenceValue.ToString())
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+        [JsonIgnore]
+        private readonly ReferenceJsonDataService _referenceJsonDataService;
+        [JsonIgnore]
+        private readonly ConfigurationService _configurationService;
+
+        [JsonIgnore]
         private bool _isExpanded;
-    public bool IsExpanded
-    {
-        get => _isExpanded;
-        set => SetProperty(ref _isExpanded, value);
-    }
+        [JsonIgnore]
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                _isExpanded = value;
+                Debug.WriteLine("IsExpanded = " + value);
+                if (_isExpanded)
+                {
+                    referenceItem = _referenceJsonDataService.GetTranslationItem(id);
+                    Debug.WriteLine("referenceItem = " + referenceItem);
+                }
+                SetProperty(ref _isExpanded, value);
+            }
+        }
 
         public int id { get; set; }
         public string Key { get; set; }
-        private string _deDE;
-        public string? deDE
-        {
-            get => _deDE;
-            set => SetProperty(ref _deDE, EscapeNewLine(value));
-        }
         public string enUS { get; set; }
+        private string _deDE;
+        public string? deDE { get => _deDE; set => SetProperty(ref _deDE, EscapeNewLine(value)); }
 
         private string _esES;
-        public string? esES
-        {
-            get => _esES;
-            set => SetProperty(ref _esES, EscapeNewLine(value));
-        }
+        public string? esES { get => _esES; set => SetProperty(ref _esES, EscapeNewLine(value)); }
         private string _esMX;
         public string? esMX { get => _esMX; set => SetProperty(ref _esMX, EscapeNewLine(value)); }
         private string _frFR;
@@ -52,22 +118,66 @@ namespace D2MTranslator.Models
         private string _zhTW;
         public string? zhTW { get => _zhTW; set => SetProperty(ref _zhTW, EscapeNewLine(value)); }
 
+        [JsonIgnore]
+        private TranslationItem _referenceItem;
+        [JsonIgnore]
+        public TranslationItem referenceItem { get => _referenceItem; set => SetProperty(ref _referenceItem, value); }
+
         private string EscapeNewLine(string text)
         {
             return text.Replace("\n", "\\n");
         }
 
+        public void OverwriteTranslation(string param)
+        {
+            PropertyInfo propertyInfo = typeof(TranslationItem).GetProperty(param);
+            if (propertyInfo == null || referenceItem == null)
+            {
+                Debug.WriteLine("propertyInfo is null");
+                return;
+            }
+            var valueToCopy = propertyInfo.GetValue(referenceItem);
+            propertyInfo.SetValue(this, valueToCopy);
+        }
+
+        [JsonIgnore]
+        public ICommand OverwriteCommand { get; private set; }
+
         public TranslationItem(int id, string key, string enUS)
         {
+            if (!DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
+            {
+                _referenceJsonDataService = App.Kernel.Get<ReferenceJsonDataService>();
+                _configurationService = App.Kernel.Get<ConfigurationService>();
+                referenceItem = _referenceJsonDataService.GetTranslationItem(id);
+
+                WeakReferenceMessenger.Default.Register<ReferencedTranslationResponseMessage>(this, (r, m) =>
+                {
+                    referenceItem = m.Item;
+                });
+                WeakReferenceMessenger.Default.Send(new ReferencedTranslationRequestMessage(this.id));
+                WeakReferenceMessenger.Default.Register<LanguageConfigChangedMessage>(this, (r, m) =>
+                {
+                    if (m.PropertyName == "SkipSame")
+                    {
+                        OnPropertyChanged(nameof(IsValid));
+                    } else if (_configurationService.LanguageVisibility.ContainsKey(m.PropertyName))
+                    {
+                        OnPropertyChanged(nameof(LanguageVisibility));
+                    }
+
+                });
+
+                OverwriteCommand = new RelayCommand<string>(OverwriteTranslation);
+            }
+            
             this.id = id;
             Key = key;
             this.enUS = enUS;
         }
 
-        public TranslationItem() {
-            id = 0;
-            Key = "testKey";
-            enUS = "test string";
+        public TranslationItem() : this(0, "key", "asdf") {
+            
         }
     }
 }

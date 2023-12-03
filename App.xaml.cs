@@ -1,4 +1,5 @@
-﻿using D2MTranslator.ViewModels;
+﻿using D2MTranslator.Services;
+using D2MTranslator.ViewModels;
 using Ninject;
 using System.Windows;
 
@@ -28,6 +29,8 @@ namespace D2MTranslator
             Kernel.Bind<JsonFileViewModel>().ToSelf().InSingletonScope();
             Kernel.Bind<MainViewModel>().ToSelf().InSingletonScope();
             Kernel.Bind<InteractiveViewModel>().ToSelf().InSingletonScope();
+            Kernel.Bind<ConfigurationService>().ToSelf().InSingletonScope();
+            Kernel.Bind<ReferenceJsonDataService>().ToSelf().InSingletonScope();
         }
     }
 }

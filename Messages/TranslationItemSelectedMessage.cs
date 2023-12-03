@@ -14,5 +14,6 @@ namespace D2MTranslator.Messages
         {
             Id = id;
         }
+        // TODO: Create ViewModel and Sync with Configuration Service
     }
 }

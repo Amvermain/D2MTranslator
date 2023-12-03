@@ -18,5 +18,10 @@ namespace D2MTranslator.Messages
             FilePath = filePath;
             FolderType = folderType;
         }
+
+        public FileOperationMessage(Enums.FileOperation save)
+        {
+            FileOperation = save;
+        }
     }
 }

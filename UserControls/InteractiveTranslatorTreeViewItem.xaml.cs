@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using D2MTranslator.Models;
+using D2MTranslator.Services;
+using Ninject;
+using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace D2MTranslator.UserControls
 {
@@ -20,12 +13,11 @@ namespace D2MTranslator.UserControls
     /// </summary>
     public partial class InteractiveTranslatorTreeViewItem : UserControl
     {
-        public int id;
-        public string enUS;
-        public string Key;
+        ReferenceJsonDataService _referenceJsonDataService;
 
         public InteractiveTranslatorTreeViewItem()
-        {
+        {            
+            _referenceJsonDataService = App.Kernel.Get<ReferenceJsonDataService>();
             InitializeComponent();
         }
     }

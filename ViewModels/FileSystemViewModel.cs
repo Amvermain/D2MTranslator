@@ -3,8 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using D2MTranslator.Messages;
 using D2MTranslator.Models;
+using D2MTranslator.Services;
 using D2MTranslator.ViewModels.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,7 +35,6 @@ namespace D2MTranslator.ViewModels
             {
                 _selectedModItem = value;
                 OnPropertyChanged(nameof(SelectedModItem));
-                // 선택된 아이템 변경에 따른 추가 로직
             }
         }
 
@@ -44,34 +45,12 @@ namespace D2MTranslator.ViewModels
             {
                 _selectedRefItem = value;
                 OnPropertyChanged(nameof(SelectedRefItem));
-                // 선택된 아이템 변경에 따른 추가 로직
             }
         }
 
-
-
-        //public ICommand OpenSelectModFile { get; private set; }
-        //public ICommand OpenSelectRefFile { get; private set; }
-
-
-
-        
-
-        private static string ConvertToJsonString(List<TranslationItem> items)
-        {
-            var options = new JsonSerializerOptions
-            {
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                WriteIndented = true
-            };
-            return JsonSerializer.Serialize(items, options);
-
-        }
-
-        
-
         private void PopulateTreeViewWithJsonFiles(string folderPath, ObservableCollection<FileSystemItem> target, FolderType folderType)
         {
+            target.Clear();
             DirectoryInfo dirInfo = new DirectoryInfo(folderPath);
             var rootItem = CreateFileSystemItem(dirInfo, folderType);
             target.Add(rootItem);
@@ -94,29 +73,19 @@ namespace D2MTranslator.ViewModels
             return item;
         }
 
-        private void LoadJsonAsLines(string jsonContent, ObservableCollection<LineItem> lines)
-        {
-            lines.Clear();
-            var splittedLines = jsonContent.Split('\n');
-            foreach (var line in splittedLines)
-            {
-                lines.Add(new LineItem { Text = line });
-            }
-            Debug.Write(lines);
-        }
-
         public FileSystemViewModel()
         {
+            _referenceJsonDataService = App.Kernel.Get<ReferenceJsonDataService>();
             InitiateRelayCommands();
             RegisterMessages();
         }
 
         private void InitiateRelayCommands()
         {
-            //OpenSelectModFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Mod));
-            //OpenSelectRefFile = new RelayCommand<RoutedPropertyChangedEventArgs<object>>(param => ExecuteOpenFile(param, FolderType.Reference));
             SaveModFileCommand = new RelayCommand<string>(SaveModFile);
         }
+
+        private readonly ReferenceJsonDataService _referenceJsonDataService;
 
         private void RegisterMessages()
         {
@@ -151,7 +120,6 @@ namespace D2MTranslator.ViewModels
             get => _previousSelectedItem; 
             set
             {
-                Debug.WriteLine("who touch it?");
                 _previousSelectedItem = value;
             }
         }
@@ -172,7 +140,7 @@ namespace D2MTranslator.ViewModels
             if (isChanged)
             {
                 // 사용자에게 변경사항 폐기 여부 확인
-                if (MessageBox.Show("Are you sure you want to discard your changes?", "Change Discard", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                if (MessageBox.Show("Are you sure you want to discard your changes?", "Discard Changes", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
                     message.Item.IsSelected = false;
                     PreviousSelectedItem.IsSelected = true;
