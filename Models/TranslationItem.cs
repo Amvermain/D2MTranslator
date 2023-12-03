@@ -94,30 +94,109 @@ namespace D2MTranslator.Models
         public string Key { get; set; }
         public string enUS { get; set; }
         private string _deDE;
-        public string? deDE { get => _deDE; set => SetProperty(ref _deDE, EscapeNewLine(value)); }
+        public string? deDE
+        {
+            get => _deDE; set
+            {
+                if (SetProperty(ref _deDE, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            }
+        }
+
+        
 
         private string _esES;
-        public string? esES { get => _esES; set => SetProperty(ref _esES, EscapeNewLine(value)); }
+        public string? esES
+        {
+            get => _esES; set
+            {
+                if (SetProperty(ref _esES, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            }
+        }
         private string _esMX;
-        public string? esMX { get => _esMX; set => SetProperty(ref _esMX, EscapeNewLine(value)); }
+        public string? esMX
+        {
+            get => _esMX; set
+            {
+                if (SetProperty(ref _esMX, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            }
+        }
         private string _frFR;
-        public string? frFR { get => _frFR; set => SetProperty(ref _frFR, EscapeNewLine(value)); }
+        public string? frFR { get => _frFR; set {
+                if (SetProperty(ref _frFR, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _itIT;
-        public string? itIT { get => _itIT; set => SetProperty(ref _itIT, EscapeNewLine(value)); }
+        public string? itIT { get => _itIT; set {
+                if (SetProperty(ref _itIT, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _jaJP;
-        public string? jaJP { get => _jaJP; set => SetProperty(ref _jaJP, EscapeNewLine(value)); }
+        public string? jaJP { get => _jaJP; set {
+                if (SetProperty(ref _jaJP, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _koKR;
-        public string? koKR { get => _koKR; set => SetProperty(ref _koKR, EscapeNewLine(value)); }
+        public string? koKR { get => _koKR; set {
+                if (SetProperty(ref _koKR, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _plPL;
-        public string? plPL { get => _plPL; set => SetProperty(ref _plPL, EscapeNewLine(value)); }
+        public string? plPL { get => _plPL; set {
+                if (SetProperty(ref _plPL, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _ptBR;
-        public string? ptBR { get => _ptBR; set => SetProperty(ref _ptBR, EscapeNewLine(value)); }
+        public string? ptBR { get => _ptBR; set {
+                if (SetProperty(ref _ptBR, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _ruRU;
-        public string? ruRU { get => _ruRU; set => SetProperty(ref _ruRU, EscapeNewLine(value)); }
+        public string? ruRU { get => _ruRU; set {
+                if (SetProperty(ref _ruRU, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _zhCN;
-        public string? zhCN { get => _zhCN; set => SetProperty(ref _zhCN, EscapeNewLine(value)); }
+        public string? zhCN { get => _zhCN; set {
+                if (SetProperty(ref _zhCN, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
         private string _zhTW;
-        public string? zhTW { get => _zhTW; set => SetProperty(ref _zhTW, EscapeNewLine(value)); }
+        public string? zhTW { get => _zhTW; set {
+                if (SetProperty(ref _zhTW, EscapeNewLine(value)))
+                {
+                    SendIsModifiedMessage();
+                }
+            } }
+
+        private void SendIsModifiedMessage()
+        {
+            WeakReferenceMessenger.Default.Send(new IsModifiedMessage(true));
+        }
 
         [JsonIgnore]
         private TranslationItem _referenceItem;

@@ -33,9 +33,9 @@
                     <MenuItem Header="Editor View" Command="{Binding ChangeViewCommand}" CommandParameter="Editor"/>
                     <!-- 추후 추가될 다른 뷰타입 메뉴 아이템 -->
                 </MenuItem>
-                <MenuItem Header="_Font"/>
                 <MenuItem Header="_Toggle Language Code" Command="{Binding ConfigLanguage}"/>
             </MenuItem>
+            <MenuItem Header="_Automerge" Command="{Binding AutomergeCommand}"/>
         </Menu>
 
         <Grid Grid.Row="1">

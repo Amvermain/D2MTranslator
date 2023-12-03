@@ -43,6 +43,12 @@ namespace D2MTranslator.ViewModels
             ChangeViewCommand = new RelayCommand<string>((type) => ChangeView(type));
             SaveCommand = new RelayCommand(() => ExecuteSave());
             ConfigLanguage = new RelayCommand(() => OpenLanguageConfigWindow());
+            AutomergeCommand = new RelayCommand(() => ExecuteAutomerge());
+        }
+
+        private void ExecuteAutomerge()
+        {
+            WeakReferenceMessenger.Default.Send(new AutomergeMessage());
         }
 
         private void ExecuteSave()
@@ -69,6 +75,7 @@ namespace D2MTranslator.ViewModels
         public ICommand ChangeViewCommand { get; private set; }
         public ICommand ConfigLanguage { get; private set; }
         public ICommand SaveCommand { get; private set; }
+        public ICommand AutomergeCommand { get; private set; }
 
         public void OnClose(object sender, CancelEventArgs e)
         {

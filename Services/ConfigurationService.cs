@@ -18,6 +18,8 @@ namespace D2MTranslator.Services
         public Dictionary<string, bool> LanguageVisibility { get; set; }
         public string? LastOpenedModDir { get; set; }
         public string? LastOpenedRefDir { get; set; }
+        public bool IsExpandByDefault { get; set; }
+
         public ConfigurationService()
         {
             LanguageVisibility = new Dictionary<string, bool>() {
@@ -34,6 +36,7 @@ namespace D2MTranslator.Services
                 { "zhCN", true },
                 { "zhTW", true }
             };
+            IsExpandByDefault = true;
             LastOpenedModDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             LastOpenedRefDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             WeakReferenceMessenger.Default.Register<LanguageConfigChangedMessage>(this, (r, m) =>
@@ -88,6 +91,11 @@ namespace D2MTranslator.Services
                 if (jsonElement.TryGetProperty("isHidingSameTranslation", out var isHidingSameTranslationElement))
                 {
                     isHidingSameTranslation = isHidingSameTranslationElement.GetBoolean();
+                }
+
+                if (jsonElement.TryGetProperty("IsExpandByDefault", out var isExpandByDefaultElement))
+                {
+                    IsExpandByDefault = isExpandByDefaultElement.GetBoolean();
                 }
             }
             WeakReferenceMessenger.Default.Send(new LanguageConfigLoadedMessage());

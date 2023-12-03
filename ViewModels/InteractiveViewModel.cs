@@ -19,7 +19,6 @@ namespace D2MTranslator.ViewModels
 {
     public class InteractiveViewModel : ObservableObject
     {
-        // TODO: 1. byte limit check
         public ObservableCollection<TranslationItem> TranslationItems { get; private set; }
         private ReferenceJsonDataService referenceJsonDataService;
 

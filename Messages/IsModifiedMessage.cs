@@ -1,4 +1,4 @@
-﻿namespace D2MTranslator.ViewModels
+﻿namespace D2MTranslator.Messages
 {
     public class IsModifiedMessage
     {

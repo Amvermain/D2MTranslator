@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using D2MTranslator.Messages;
+using D2MTranslator.Services;
+using Ninject;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -10,7 +12,7 @@ namespace D2MTranslator.Models
     {
         public string Name { get; set; }
         public List<FileSystemItem> Items { get; set; } = new List<FileSystemItem>();
-        public bool IsExpanded { get; set; } = true;
+        public bool IsExpanded { get; set; }
         public string ParentPath { get; internal set; }
         public Enums.FolderType FolderType { get; set; }
 
@@ -38,6 +40,7 @@ namespace D2MTranslator.Models
 
         public FileSystemItem(string name, string parentPath, Enums.FolderType folderType)
         {
+            IsExpanded = App.Kernel.Get<ConfigurationService>().IsExpandByDefault;
             Name = name;
             ParentPath = parentPath;
             FolderType = folderType;

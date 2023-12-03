@@ -19,7 +19,7 @@ namespace D2MTranslator.Services
     public class ReferenceJsonDataService
     {
         private readonly Dictionary<int, TranslationItem> referenceData = new();
-        private readonly Dictionary<string, string> filePaths = new();
+        public readonly Dictionary<string, string> filePaths = new();
         public ReferenceJsonDataService()
         {
             Debug.WriteLine("ReferenceJsonDataService 생성");

@@ -40,6 +40,9 @@ namespace D2MTranslator.ViewModels
 
         private bool _skipSame;
         public bool SkipSame { get => _skipSame; set => SetPropertySentMessage(ref _skipSame, value, nameof(SkipSame)); }
+        
+        private bool _isExpandByDefault;
+        public bool IsExpandByDefault { get => _isExpandByDefault; set => SetPropertySentMessage(ref _isExpandByDefault, value, nameof(IsExpandByDefault)); }
 
         private bool SetPropertySentMessage(ref bool field, bool value, string propertyName)
         {
@@ -103,6 +106,7 @@ namespace D2MTranslator.ViewModels
             if (visibility.ContainsKey("zhTW"))
                 zhTW = visibility["zhTW"];
             SkipSame = configurationService.isHidingSameTranslation;
+            IsExpandByDefault = configurationService.IsExpandByDefault;
         }
 
 

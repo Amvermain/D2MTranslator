@@ -44,6 +44,11 @@
                     <TextBlock Text="Skip items with the same content"  TextWrapping="Wrap"/>
                 </CheckBox.Content>
             </CheckBox>
+            <CheckBox IsChecked="{Binding Path=IsExpandByDefault, Mode=TwoWay}" Width="128">
+                <CheckBox.Content>
+                    <TextBlock Text="Is Item expanded by default?" TextWrapping="Wrap"/>
+                </CheckBox.Content>
+            </CheckBox>
         </ListBox>
     </Grid>
 </Window>
