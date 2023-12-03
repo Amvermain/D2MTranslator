@@ -82,7 +82,7 @@ namespace D2MTranslator.ViewModels
 
         private void InitiateRelayCommands()
         {
-            SaveModFileCommand = new RelayCommand<string>(SaveModFile);
+            
         }
 
         private readonly ReferenceJsonDataService _referenceJsonDataService;
@@ -92,14 +92,23 @@ namespace D2MTranslator.ViewModels
             WeakReferenceMessenger.Default.Register<FileItemSelectedMessage>(this, OnFileItemSelected);
             WeakReferenceMessenger.Default.Register<FileOperationMessage>(this, (r, m) =>
             {
-                if (m.FolderType == FolderType.Mod)
+                if (m.FileOperation == FileOperation.Open)
                 {
-                    PopulateTreeViewWithJsonFiles(m.FilePath, OriginalItems, FolderType.Mod);
-                }
-                else if (m.FolderType == FolderType.Reference)
+                    var folderType = m.FolderType;
+                    var folderPath = m.FilePath;
+                    if (folderType == FolderType.Mod)
+                    {
+                        PopulateTreeViewWithJsonFiles(folderPath, OriginalItems, FolderType.Mod);
+                    }
+                    else if (folderType == FolderType.Reference)
+                    {
+                        PopulateTreeViewWithJsonFiles(folderPath, ReferenceItems, FolderType.Reference);
+                    }
+                } else if (m.FileOperation == FileOperation.Save)
                 {
-                    PopulateTreeViewWithJsonFiles(m.FilePath, ReferenceItems ,FolderType.Reference);
+                    WeakReferenceMessenger.Default.Send(new FileSaveMessage(_selectedModItem));
                 }
+                
             });
             WeakReferenceMessenger.Default.Register<IsModifiedMessage>(this, (r, m) =>
             {
@@ -111,9 +120,15 @@ namespace D2MTranslator.ViewModels
                 Debug.WriteLine("FileOpenFinishMessage / " + preservedPreviousItem.Name + " / " + PreviousSelectedItem?.Name);
                 PreviousSelectedItem = preservedPreviousItem;
             });
+            WeakReferenceMessenger.Default.Register<SavedFileContentMessage>(this, (r, m) =>
+            {
+                Debug.WriteLine("SavedFileContentMessage Received");
+                File.WriteAllText(m.selectedModItem.ParentPath + "\\" + m.selectedModItem.Name, m.json);
+                WeakReferenceMessenger.Default.Send(new IsModifiedMessage(false));
+            });
+            
         }
 
-        public ICommand SaveModFileCommand { get; private set; }
         FileSystemItem preservedPreviousItem;
         public FileSystemItem PreviousSelectedItem
         {
@@ -122,11 +137,6 @@ namespace D2MTranslator.ViewModels
             {
                 _previousSelectedItem = value;
             }
-        }
-
-        private void SaveModFile(object commandParameter)
-        {
-
         }
 
         private FileSystemItem _previousSelectedItem;
@@ -147,6 +157,11 @@ namespace D2MTranslator.ViewModels
                     return;
                 }
             }
+
+            if (message.Item.FolderType == FolderType.Mod) 
+                _selectedModItem = message.Item;
+            else if (message.Item.FolderType == FolderType.Reference)
+                _selectedRefItem = message.Item;
 
             // 파일 열기 로직 또는 다른 처리...
             preservedPreviousItem = message.Item;

@@ -18,6 +18,7 @@ namespace D2MTranslator.Models
     [Serializable]
     public class TranslationItem : ObservableObject
     {
+        [JsonIgnore]
         public bool IsValid
         {
             get

@@ -47,6 +47,14 @@ namespace D2MTranslator.ViewModels
 
                 WeakReferenceMessenger.Default.Send(new FileOpenFinishMessage());
             });
+            WeakReferenceMessenger.Default.Register<FileSaveMessage>(this, (r, m) => { 
+                Debug.WriteLine("FileSaveMessage Received");
+                var json = JsonSerializer.Serialize(value: TranslationItems.ToList(), options: new JsonSerializerOptions() {
+                    WriteIndented = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+                WeakReferenceMessenger.Default.Send(new SavedFileContentMessage(json, m.selectedModItem));
+            });
             //var item = new TranslationItem(0, "key", "test");
             //TranslationItems.Add(item);
         }
